@@ -105,7 +105,7 @@ $( document ).ready(function(){
 
 /* Display a list of all room */
   function displayList(data) {
-    console.log(data);
+    log('<kbd>Channel\'s List','info');
   	for(var val of data.room) {
   		log(val, 'info');
   	}
@@ -441,6 +441,13 @@ function addLogElement(el) {
   socket.on('userList', function(data) {
     displayUser(data);
     console.log(data);
+  });
+
+  socket.on('msgJoin', function(room) {
+    log('<kbd>You join the chan : </kbd><kbd>' + room + '</kbd>');
+  });
+  socket.on('msgPart', function(room) {
+    log('<kbd>You leave the chan : </kbd><kbd>' + room + '</kbd>');
   });
 
   socket.on('sendMsgTo', function(name){

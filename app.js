@@ -23,9 +23,11 @@ io.on('connection', function (socket) {
 
   //user can join /unjoin specific room
   socket.on('joinRoom' , function(room){
+    socket.emit('msgJoin', room);
   	socket.join(room);
   });
   socket.on('leaveRoom' , function(room){
+    socket.emit('msgPart', room);
   	socket.leave(room);
   });
 
