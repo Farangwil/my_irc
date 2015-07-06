@@ -1,0 +1,15 @@
+{
+  "name": "RedlineChat",
+  "version": "1.0.1",
+  "description": "A simple chat using socket IO by Redline",
+  "main": "app.js",
+  "author": "Redlinedev",
+  "private": true,
+  "license": "BSD",
+  "dependencies": {
+    "express": "^4.13.0",
+    "package": "*",
+    "readable-stream": "*",
+    "stream-counter": "*"
+  }
+}

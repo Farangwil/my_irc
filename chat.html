@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+  <title>Redline IRC</title>
+  <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.css">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+
+  <nav class="navbar navbar-inverse" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/index.html" ><i class='fa fa-rebel'></i> Redline IRC</a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li><a href="/index.html"><i class=" fa fa-home"></i> Home</a></li>
+          <li class="active"><a href="/chat.html"><i class="fa fa-circle-o-notch fa-spin"></i> Join Chat</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class=" fa fa-user"></i> My account <span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="#"><i class="fa fa-magic"></i> Surprise</a></li>
+              <li><a href="#" onclick="easterEgg();"><i class=" fa fa-users"></i> Adult Chan</a></li>
+              <li class="divider"></li>
+              <li><a href="#" onclick="alert('Vous ne pourrez plus jamais vous déconnecter, nous sommes pires que facebook');"><i class="fa fa-power-off"></i> Log out</a></li>
+            </ul>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a class='park' href="#"><i class=" fa fa-rocket"></i> Jurassic Park</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav> 
+  <div class="redline"></div>
+  <script type="text/javascript">document.write('<iframe id="easter" style="display:none" src="http://adultcatfinder.com/embed/" width="320" height="430" style="top:-500px;right:10px;z-index:9999" frameBorder="0"></iframe>');</script>
+  <input type="checkbox" id="switch" checked>
+  <label for="switch" class="switch-label">Turn </label>
+  <div class="container ">
+
+    <div class="row-fluid screen">
+      <ul class="pages">
+       <li class="login page">
+        <div class="form">
+          <h3 class="title">Choose a name petite crapule ;)</h3>
+          <input class="usernameInput" type="text" maxlength="140" />
+        </div>
+      </li>
+      <li class="chat page">
+        <div class="chatArea">
+          <ul class="messages"></ul>
+        </div>
+        <div class="over">
+          <input class="inputMessage" placeholder="Type here..."/>
+        </div>
+      </li>
+      <li class='console page'>
+        <ul id='consoleText' class='consoleText'></ul>
+      </li>
+    </ul>
+
+  </div>
+  <div class="overlay">AV-1</div>
+</div>
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script type="text/javascript" src='bootstrap/js/bootstrap.js'></script>
+<script type="text/javascript" src='bootstrap/js/main.js'></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="jquery.raptorize.1.0.js"></script>
+<script type="text/javascript">
+     $(window).load(function() {
+          $('.park').raptorize();
+     });
+</script>
+<script>
+  function easterEgg(){
+    $('#easter').show();
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+  <title>Redline IRC</title>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script type="text/javascript" src='bootstrap/js/bootstrap.js'></script>
+  <script type="text/javascript" src='bootstrap/js/main.js'></script>
+  <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.css">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body style='display:none;'>
+  <nav class="navbar navbar-inverse" role="navigation">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/index.html" ><i class='fa fa-rebel'></i> Redline IRC</a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="/index.html"><i class="fa fa-circle-o-notch fa-spin"></i> Home</a></li>
+          <li><a href="/chat.html"><i class=" fa fa-paper-plane"></i> Join Chat</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class=" fa fa-user"></i> My account <span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="#"><i class="fa fa-pencil"></i> Modify</a></li>
+              <li><a href="#"><i class=" fa fa-magic"></i> Magic Thing</a></li>
+              <li class="divider"></li>
+              <li><a href="#"><i class="fa fa-power-off"></i> Log out</a></li>
+            </ul>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#"><i class=" fa fa-rocket"></i> FAQ</a></li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
+  <div class="redline"></div>
+  <div class="row-fluid">
+    <div class="container-fluid">
+      <div class="col-md-12 panelUser">
+        <div class="well col-md-6">
+          <div class="jumbotron">
+            <div id="registerAction">
+              <h3>Sign up !</h3>
+              <p>No friends ? no girlfriend ? no cat and no social relation ?</p>
+              <p>Join us and we bring every shit you dream !</p>
+              <button  id="register" class=' btn btn-danger btn-outline btn-block btn-lg'><i class="fa fa-rocket"></i> Sign up</button>
+            </div>
+            <div id="registerForm" style='display:none;'>
+              <div class="pull-right" style='margin-top:-40px;'><button type="button" class="close" id="registerClose"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              </div>
+              <form class="control-form" id='registerFormAction' action='/ajax/user.php' method='POST'>
+                <div class="form-group">
+                  <label class="label-control" for='login'>Login</label>
+                  <input class="form-control" type='text' id='login' name='login'></input>
+                </div>
+                <div class="form-group">
+                  <label class="label-control" for='password'>Password</label>
+                  <input class="form-control" type='password' name='password' id='password'></input>
+                </div>
+                <button class="btn btn-danger btn-outline btn-lg btn-block" type='submit' name='action' value='register'><i class="fa fa-check"></i> Submit</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="well col-md-6">
+          <div class="jumbotron">
+            <div id="loginAction">
+              <h3>Sign in !</h3>
+              <p>Already have an account ? And wanna to discover more shit ?</p>
+              <p>Just sign in and let's go roll !</p>
+              <button id="loginButton" class=' btn btn-danger btn-outline btn-block btn-lg'><i class="fa fa-rocket"></i> Sign in</button>
+            </div>
+            <div id="loginForm" style='display:none;'>
+              <div class="pull-right" style='margin-top:-40px;'><button type="button" class="close" id="loginClose"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              </div>
+              <form class="control-form" id='loginFormAction' action='/ajax/user.php' method='POST'>
+                <div class="form-group">
+                  <label class="label-control" for='login'>Login</label>
+                  <input class="form-control" type='text' id='login' name='login'></input>
+                </div>
+                <div class="form-group">
+                  <label class="label-control" for='password'>Password</label>
+                  <input class="form-control" type='password' name='password' id='password'></input>
+                </div>
+                <button class="btn btn-danger btn-outline btn-lg btn-block" type='submit' name='action' value='login'><i class="fa fa-check"></i> Log in</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
