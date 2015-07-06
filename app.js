@@ -130,3 +130,7 @@ function getRooms(rooms) {
     console.log(rooms);
     return availableRooms;
 }
+
+//@TODO Send Msg to specific user
+//Front : Create physic room (onglet)
+//logic join \ leave room
