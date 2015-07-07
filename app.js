@@ -56,6 +56,7 @@ io.on('connection', function (socket) {
 
   // when the client emits 'new message', this listens and executes
   socket.on('new message', function (data) {
+    console.log(data);
     // we tell the client to execute 'new message'
     socket.in(data.room).emit('new message', {
     	username: socket.username,
@@ -84,16 +85,21 @@ io.on('connection', function (socket) {
 
   // when the client emits 'typing', we broadcast it to others
   socket.on('typing', function () {
-  	socket.broadcast.emit('typing', {
+  	socket.in('world').emit('typing', {
   		username: socket.username
   	});
   });
 
   // when the client emits 'stop typing', we broadcast it to others
   socket.on('stop typing', function () {
-  	socket.broadcast.emit('stop typing', {
+  	socket.in('world').emit('stop typing', {
   		username: socket.username
   	});
+  });
+
+  socket.on('room', function(data){
+    socket.room = data;
+    alert(socket.room);
   });
 
   // when the user disconnects.. perform this

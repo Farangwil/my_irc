@@ -290,7 +290,7 @@ textarea {
   line-height: inherit;
 }
 a {
-  color: #428bca;
+  color: #55CA42;
   text-decoration: none;
 }
 a:hover,
@@ -3575,7 +3575,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .nav-pills > li.active > a:hover,
 .nav-pills > li.active > a:focus {
   color: #fff;
-  background-color: #428bca;
+  background-color: #95a5a6;
 }
 .nav-stacked > li {
   float: none;
@@ -5858,8 +5858,8 @@ ul {
 
 .page {
   height: 100%;
-  min-height: 660px;
-  max-height: 660px;
+  min-height: 500px;
+  max-height: 500px;
   position: relative;
   float: left;
   display: inline-block;
@@ -5870,8 +5870,8 @@ ul {
 /* Console page */
 .console.page {
   background-color: #222;
-  border: 1px solid #e74c3c;
-  border-top:none;
+  border: 1px dashed #d35400;
+  /*border-top:none;*/
 }
 
 /* Login Page */
@@ -5916,10 +5916,10 @@ ul {
 /* Chat page */
 
 .chat.page {
-  display: none;
+  /*display: none;*/
   background:#222;
   border-top:none;
-  border: 1px solid #e74c3c;
+  border: 1px dashed #d35400;
   overflow-y: auto;
 }
 
@@ -5982,7 +5982,7 @@ ul {
   width: 100%;
   outline: none;
   padding-left: 10px;
-  position: absolute;
+  /*position: fixed;*/
   right: 0;
   /*z-index: 3;*/
   width: 100%;
@@ -5990,12 +5990,13 @@ ul {
 
 
 .over {
-  position: absolute;
+  position: fixed;
 }
 
 
 #switch {
   display: none;
+  left: 300px;
 }
 
 .switch-label {
@@ -6008,10 +6009,11 @@ ul {
   padding-right: 15px;
   border-radius: 5px;
   margin-top: 10px;
+  margin-left:  40px;
   box-shadow: 0 2px #666;
 }
 .switch-label::after {
-  content: "on";
+  content: "Connect me to the awesome";
 }
 .switch-label::before {
   content: " ";
@@ -6032,7 +6034,7 @@ ul {
   background: #22ff55;
 }
 #switch:checked + .switch-label::after {
-  content: "off";
+  content: "I want to cry ... Stop it !";
 }
 
 @keyframes flicker {

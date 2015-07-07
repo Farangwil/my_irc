@@ -4,33 +4,10 @@ $(window).load(function() {
     	});
 });
 $( document ).ready(function(){
-	$('#register').on('click' , function(){
-		$('#registerAction').toggle('fast');
-		$('#registerForm').toggle('slow');
-	});
-	$('#registerClose').on('click' , function(){
-		$('#registerForm').toggle('fast');
-		$('#registerAction').toggle('slow');
-	});
-	$('#loginButton').on('click' , function(){
-		$('#loginAction').toggle('fast');
-		$('#loginForm').toggle('slow');
-	}),
-	$('#loginClose').on('click' , function(){
-		$('#loginForm').toggle('fast');
-		$('#loginAction').toggle('slow');
-	});
 
-  var FADE_TIME = 150; // ms
-  var TYPING_TIMER_LENGTH = 400; // ms
-  var COLORS = [
-  '#e21400', '#91580f', '#f8a700', '#f78b00',
-  '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
-  '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
-  ];
 
-  // Initialize varibles
-  var $window = $(window);
+   // Initialize varibles
+   var $window = $(window);
   var $usernameInput = $('.usernameInput'); // Input for username
   var $messages = $('.messages'); // Messages area
   var $inputMessage = $('.inputMessage'); // Input message input box
@@ -40,7 +17,9 @@ $( document ).ready(function(){
   var $loginPage = $('.login.page'); // The login page
   var $chatPage = $('.chat.page'); // The chatroom page
 
+  var socket = io();
   var Room ="world";
+  var classRoom = "world";
   // Prompt for setting a username
   var username;
   var connected = false;
@@ -48,86 +27,139 @@ $( document ).ready(function(){
   var lastTypingTime;
   var $currentInput = $usernameInput.focus();
 
-  var socket = io();
+// Multiroom
+// 
 
-/*Commands line chat */
+
+
+$('#register').on('click' , function(){
+  $('#registerAction').toggle('fast');
+  $('#registerForm').toggle('slow');
+});
+$('#registerClose').on('click' , function(){
+  $('#registerForm').toggle('fast');
+  $('#registerAction').toggle('slow');
+});
+$('#loginButton').on('click' , function(){
+  $('#loginAction').toggle('fast');
+  $('#loginForm').toggle('slow');
+}),
+$('#loginClose').on('click' , function(){
+  $('#loginForm').toggle('fast');
+  $('#loginAction').toggle('slow');
+});
+
+  var FADE_TIME = 150; // ms
+  var TYPING_TIMER_LENGTH = 400; // ms
+  var COLORS = [
+  '#e21400', '#91580f', '#f8a700', '#f78b00',
+  '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
+  '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
+  ];
+
+
+
+$('ul#onglet li').on('click', function(e){
+      var id = $(this).attr('data-id');
+      classRoom = id;
+    });
+
+
+
+  /*Commands line chat */
   function joinRoom(room){
   	//tell the server to join specific room
   	socket.emit('joinRoom', room);
   	Room = room;
+
+    $('#onglet').append('<li role="presentation" class="'+room+'A" data-id="'+room+'"><a href="#'+room+'" role="tab" data-toggle="tab" aria-controls="'+ room +'">'+ room +'</a></li>');
+
+    var tab = '<div role="tabpanel" class="tab-pane fade" id="' + room + '">';
+    tab += ' <li class="chat page"><div class="chatArea"><ul class="messages ' + room + '"></ul></div>';
+    tab += '</li></div>';
+    $('#chatScreen').append(tab);
+
+    $('ul#onglet li').on('click', function(e){
+      var id = $(this).attr('data-id');
+      classRoom = id;
+      $messages = $('.' + classRoom);
+    });
   }
 
   function leaveRoom (room) {
   	//tell the server to leave a specific room
   	socket.emit('leaveRoom' , room);
+    $('#' + room).remove();
+    $('.' + room + 'A').remove();
+
   }
 
 //change user username
-  function nickName(name) {
-  	socket.emit('nickName' , name);
-  	username = name;
-  }
+function nickName(name) {
+ socket.emit('nickName' , name);
+ username = name;
+}
 
-  function listChan(string) {
-  	socket.emit('listChan' , string);
-  }
+function listChan(string) {
+ socket.emit('listChan' , string);
+}
 
-  function listUsr()
-  {
-    socket.emit('listUsr');
-  }
+function listUsr()
+{
+  socket.emit('listUsr');
+}
 
-  /* Send message to specified user */
-  function sendMessageTo(name)
-  {
-    socket.emit('privateMsg', name);
-  }
+/* Send message to specified user */
+function sendMessageTo(name)
+{
+  socket.emit('privateMsg', name);
+}
 
-  function changeUsername (name) {
-    log("Your name has change to : <kbd>" + name + '</kbd>', 'info');
-  }
+function changeUsername (name) {
+  log("Your name has change to : <kbd>" + name + '</kbd>', 'info');
+}
 
 /* display the help */
-  function displayHelp()
-  {
-    var message = 'Here is the list of all availables commands in this fuckin chat';
-        message += '<ul>';
-        message += '<li><kbd>/nick_nickname</kbd> Allow you to change your name</li>';
-        message += '<li><kbd>/list_ </kbd> List all fucking channels ( and private chan too )</li>';
-        message += '<li><kbd>/join_channel</kbd> Join a specified channel, if that don\'t exist, create it</li>';
-        message += '<li><kbd>/part_channel</kbd> Leave specified channel</li>';
-        message += '<li><kbd>/users_</kbd> List all other nerdy redliner</li>';
-        message += '<li><kbd>/msg_nickname</kbd> Send private message to specified user ( no dick pics ! )</li>';
-        message += '<li><kbd>*Whatever you want*</kbd> Send message to the channel where you are</li>';
-        message += '<ul>';
-        log(message, 'ok');
-  }
+function displayHelp()
+{
+  var message = 'Here is the list of all availables commands in this fuckin chat';
+  message += '<ul>';
+  message += '<li><kbd>/nick_nickname</kbd> Allow you to change your name</li>';
+  message += '<li><kbd>/list_ </kbd> List all fucking channels ( and private chan too )</li>';
+  message += '<li><kbd>/join_channel</kbd> Join a specified channel, if that don\'t exist, create it</li>';
+  message += '<li><kbd>/part_channel</kbd> Leave specified channel</li>';
+  message += '<li><kbd>/users_</kbd> List all other nerdy redliner</li>';
+  message += '<li><kbd>/msg_nickname</kbd> Send private message to specified user ( no dick pics ! )</li>';
+  message += '<li><kbd>*Whatever you want*</kbd> Send message to the channel where you are</li>';
+  message += '<ul>';
+  log(message, 'ok');
+}
 
 /* Display a list of all room */
-  function displayList(data) {
-    log('<kbd>Channel\'s List','info');
-  	for(var val of data.room) {
-  		log(val, 'info');
-  	}
+function displayList(data) {
+  log('<kbd>Channel\'s List','info');
+  for(var val of data.room) {
+    log(val, 'info');
   }
+}
 
 /* Display alist of all users in all room */
-  function displayUser(data) {
-    log('<kbd>Users online</kbd>', 'info');
-    for(var val in data.data){
-      log(val, 'info');
-    }
+function displayUser(data) {
+  log('<kbd>Users online</kbd>', 'info');
+  for(var val in data.data){
+    log(val, 'info');
   }
+}
 
-  function addParticipantsMessage (data) {
-  	var message = '';
-  	if (data.numUsers === 1) {
-  		message += "1 Redliner connected";
-  	} else {
-  		message +=  data.numUsers + " Redliner connected";
-  	}
-  	log(message);
-  }
+function addParticipantsMessage (data) {
+ var message = '';
+ if (data.numUsers === 1) {
+  message += "1 Redliner connected";
+} else {
+  message +=  data.numUsers + " Redliner connected";
+}
+log(message);
+}
 
   // Sets the client's username
   function setUsername () {
@@ -142,51 +174,55 @@ $( document ).ready(function(){
 
       // Tell the server your username
       socket.emit('add user', username);
+    }
   }
-}
 
-function defineCommande(message) {
-	var commande = "";
-	var option = "";
-	if(message.indexOf('_')){
-		commande = message.substr(0 , message.indexOf('_'));
-		option = message.substr(message.indexOf('_') + 1);
+  function defineCommande(message) {
+   var commande = "";
+   var option = "";
+   if(message.indexOf('_')){
+    commande = message.substr(0 , message.indexOf('_'));
+    option = message.substr(message.indexOf('_') + 1);
 
-		switch(commande) {
-			case '/join' :
-				joinRoom(option);
-				$inputMessage.val('');
-			break;
-			case '/part':
-				leaveRoom(option);
-				$inputMessage.val('');
-			break;
-			case '/nick' :
-				nickName(option);
-				$inputMessage.val('');
-			break;
-			case '/list' :
-				listChan(option);
-				$inputMessage.val('');
-			break;
-      case '/users' :
-        listUsr();
-        $inputMessage.val('');
+    switch(commande) {
+     case '/join' :
+     joinRoom(option);
+     $inputMessage.val('');
+     break;
+     case '/part':
+     leaveRoom(option);
+     $inputMessage.val('');
+     break;
+     case '/nick' :
+     nickName(option);
+     $inputMessage.val('');
+     break;
+     case '/list' :
+     listChan(option);
+     $inputMessage.val('');
+     break;
+     case '/users' :
+     listUsr();
+     $inputMessage.val('');
+     break;
+     case '/msg' :
+     sendMessageTo(option);
+     $inputMessage.val('');
+     break;
+     case '/help' :
+     displayHelp();
+     $inputMessage.val('');
+     break;
+     case '/pangolin' : 
+      easter('loop');
+      $inputMessage.val('');
       break;
-      case '/msg' :
-        sendMessageTo(option);
-        $inputMessage.val('');
-      break;
-      case '/help' :
-        displayHelp();
-        $inputMessage.val('');
-      break;
-			default:
-				$inputMessage.val('');
-				log('not a valid command , type <kbd>/help_</kbd> for help or man google', 'error');
-			break;
-		}
-	}
+     default:
+     $inputMessage.val('');
+     log('not a valid command , type <kbd>/help_</kbd> for help or man google', 'error');
+     break;
+   }
+ }
 }
 
   // Sends a chat message
@@ -204,11 +240,11 @@ function defineCommande(message) {
     	addChatMessage({
     		username: username,
     		message: message
-    	});
+    	}, 'undefined', classRoom);
       // tell server to execute 'new message' and send along one parameter
-      socket.emit('new message', {room : Room , message : message});
+      socket.emit('new message', {room : classRoom , message : message});
+    }
   }
-}
 
   // Log a message
   // function log (message, options) {
@@ -220,27 +256,29 @@ function defineCommande(message) {
     var color;
     switch(option){
       case 'error':
-        color = "##e74c3c";
+      color = "##e74c3c";
       break;
       case 'ok':
-        color = '#2ecc71';
+      color = '#2ecc71';
       break;
       case 'warning':
-        color ='#e67e22'
+      color ='#e67e22'
       break;
       case 'info':
-        color = '#9b59b6'
+      color = '#9b59b6'
       break;
       default:
-        color = '#ecf0f1';
+      color = '#ecf0f1';
       break;
     }
     var $el = $('<li style="color:'+color+'">').addClass('log2').html(message).fadeIn('slow');
     addLogElement($el);
   }
 
+
+
   // Adds the visual chat message to the message list
-  function addChatMessage (data, options) {
+  function addChatMessage (data, options, classRoom) {
     // Don't fade the message in if there is an 'X was typing'
     var $typingMessages = getTypingMessages(data);
     options = options || {};
@@ -256,13 +294,13 @@ function defineCommande(message) {
     .text(data.message);
 
     var typingClass = data.typing ? 'typing' : '';
-    var $messageDiv = $('<li class="message"/>')
+    var $messageDiv = $('<li class="messages ' + classRoom + '"/>')
     .data('username', data.username)
     .addClass(typingClass)
     .append($usernameDiv, $messageBodyDiv);
 
     addMessageElement($messageDiv, options);
-}
+  }
 
   // Adds the visual chat typing message
   function addChatTyping (data) {
@@ -307,13 +345,13 @@ function defineCommande(message) {
     	$messages.append($el);
     }
     $messages[0].scrollTop = $messages[0].scrollHeight;
-}
+  }
 
-function addLogElement(el) {
-  var $el = $(el);
-  $log.append($el);
-  $log[0].scrollTop = $log[0].scrollHeight;
-}
+  function addLogElement(el) {
+    var $el = $(el);
+    $log.append($el);
+    $log[0].scrollTop = $log[0].scrollHeight;
+  }
 
   // Prevents input from having injected markup
   function cleanInput (input) {
@@ -357,7 +395,7 @@ function addLogElement(el) {
     // Calculate color
     var index = Math.abs(hash % COLORS.length);
     return COLORS[index];
-}
+  }
 
   // Keyboard events
 
@@ -376,7 +414,7 @@ function addLogElement(el) {
     		setUsername();
     	}
     }
-});
+  });
 
   $inputMessage.on('input', function() {
   	updateTyping();
@@ -403,11 +441,11 @@ function addLogElement(el) {
     var message = "Welcome to Redline Irc , Enjoy your taste; ";
     log(message, 'ok');
     addParticipantsMessage(data);
-});
+  });
 
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', function (data) {
-  	addChatMessage(data);
+  	addChatMessage(data, 'undefined', classRoom);
   });
 
   // Whenever the server emits 'user joined', log it in the chat body
@@ -434,29 +472,29 @@ function addLogElement(el) {
   });
 
 //Chenever the server emits 'chanList' , show the list of chan
-  socket.on('chanList' , function(data) {
-  	displayList(data);
-  });
+socket.on('chanList' , function(data) {
+ displayList(data);
+});
 
-  socket.on('userList', function(data) {
-    displayUser(data);
-    console.log(data);
-  });
+socket.on('userList', function(data) {
+  displayUser(data);
+  console.log(data);
+});
 
-  socket.on('msgJoin', function(room) {
-    log('<kbd>You join the chan : </kbd><kbd>' + room + '</kbd>');
-  });
-  socket.on('msgPart', function(room) {
-    log('<kbd>You leave the chan : </kbd><kbd>' + room + '</kbd>');
-  });
+socket.on('msgJoin', function(room) {
+  log('<kbd>You join the chan : </kbd><kbd>' + room + '</kbd>');
+});
+socket.on('msgPart', function(room) {
+  log('<kbd>You leave the chan : </kbd><kbd>' + room + '</kbd>');
+});
 
-  socket.on('sendMsgTo', function(name){
-    alert('Private message from ' + name + ' is like devil spam');
+socket.on('sendMsgTo', function(name){
+  alert('Private message from ' + name + ' is like devil spam');
     // sendMsgTo(name);
   });
 
-  socket.on('newUsername', function(data) {
-    changeUsername(data.data);
-  });
+socket.on('newUsername', function(data) {
+  changeUsername(data.data);
+});
 
 });
