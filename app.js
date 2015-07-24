@@ -16,6 +16,7 @@ app.use(express.static(__dirname));
 
 // usernames which are currently connected to the chat
 var usernames = {};
+var socketArr = {};
 var numUsers = 0;
 
 io.on('connection', function (socket) {
@@ -57,10 +58,11 @@ io.on('connection', function (socket) {
   // when the client emits 'new message', this listens and executes
   socket.on('new message', function (data) {
     console.log(data);
-    // we tell the client to execute 'new message'
+    // we tell the client to execute 'new message' into specific room
     socket.in(data.room).emit('new message', {
     	username: socket.username,
-    	message: data.message
+    	message: data.message,
+      room: data.room
     });
   });
 
@@ -70,6 +72,7 @@ io.on('connection', function (socket) {
     socket.username = username;
     // add the client's username to the global list
     usernames[username] = username;
+    socketArr[username] = socket;
     ++numUsers;
     addedUser = true;
     socket.join('world');
@@ -84,15 +87,16 @@ io.on('connection', function (socket) {
   });
 
   // when the client emits 'typing', we broadcast it to others
-  socket.on('typing', function () {
-  	socket.in('world').emit('typing', {
-  		username: socket.username
+  socket.on('typing', function (room) {
+  	socket.broadcast.emit('typing', {
+  		username: socket.username,
+      room: room
   	});
   });
 
   // when the client emits 'stop typing', we broadcast it to others
   socket.on('stop typing', function () {
-  	socket.in('world').emit('stop typing', {
+  	socket.broadcast.emit('stop typing', {
   		username: socket.username
   	});
   });
@@ -118,9 +122,9 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('privateMsg', function(name){
-    // io.to(name).emit('')
-    socket.emit('sendMsgTo', name);
+  socket.on('privateMsg', function(name, nameFrom, msg){
+    var data = {message: msg, name: name, nameFrom: nameFrom};
+    socketArr[name].emit('prvtMsg', data);
   });
 });
 

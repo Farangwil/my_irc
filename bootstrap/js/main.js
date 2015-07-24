@@ -9,7 +9,7 @@ $( document ).ready(function(){
    // Initialize varibles
    var $window = $(window);
   var $usernameInput = $('.usernameInput'); // Input for username
-  var $messages = $('.messages'); // Messages area
+  var $messages = $('.messages.world'); // Messages area
   var $inputMessage = $('.inputMessage'); // Input message input box
   var $log = $('#consoleText'); // Log message 
 
@@ -59,17 +59,16 @@ $('#loginClose').on('click' , function(){
 
 
 
-$('ul#onglet li').on('click', function(e){
-      var id = $(this).attr('data-id');
-      classRoom = id;
-    });
+  $('ul#onglet li').on('click', function(e){
+    var id = $(this).attr('data-id');
+    classRoom = id;
+  });
 
 
-
-  /*Commands line chat */
-  function joinRoom(room){
+// var Room;
+/*Commands line chat */
+function joinRoom(room){
   	//tell the server to join specific room
-  	socket.emit('joinRoom', room);
   	Room = room;
 
     $('#onglet').append('<li role="presentation" class="'+room+'A" data-id="'+room+'"><a href="#'+room+'" role="tab" data-toggle="tab" aria-controls="'+ room +'">'+ room +'</a></li>');
@@ -77,13 +76,23 @@ $('ul#onglet li').on('click', function(e){
     var tab = '<div role="tabpanel" class="tab-pane fade" id="' + room + '">';
     tab += ' <li class="chat page"><div class="chatArea"><ul class="messages ' + room + '"></ul></div>';
     tab += '</li></div>';
+
     $('#chatScreen').append(tab);
 
     $('ul#onglet li').on('click', function(e){
       var id = $(this).attr('data-id');
       classRoom = id;
-      $messages = $('.' + classRoom);
+      
+      $messages = null;
+      $messages = $('.messages.' + classRoom);
+      joinRoomReal(classRoom);
     });
+  }
+
+
+
+  function joinRoomReal(room){
+    socket.emit('joinRoom', room);
   }
 
   function leaveRoom (room) {
@@ -110,9 +119,9 @@ function listUsr()
 }
 
 /* Send message to specified user */
-function sendMessageTo(name)
+function sendMessageTo(name, msg)
 {
-  socket.emit('privateMsg', name);
+  socket.emit('privateMsg', name, username, msg);
 }
 
 function changeUsername (name) {
@@ -131,6 +140,7 @@ function displayHelp()
   message += '<li><kbd>/users_</kbd> List all other nerdy redliner</li>';
   message += '<li><kbd>/msg_nickname</kbd> Send private message to specified user ( no dick pics ! )</li>';
   message += '<li><kbd>*Whatever you want*</kbd> Send message to the channel where you are</li>';
+  message += '<li><kbd>/pangolin_</kbd> Easter egg';
   message += '<ul>';
   log(message, 'ok');
 }
@@ -180,9 +190,21 @@ log(message);
   function defineCommande(message) {
    var commande = "";
    var option = "";
+   var msg = "";
+   
    if(message.indexOf('_')){
     commande = message.substr(0 , message.indexOf('_'));
-    option = message.substr(message.indexOf('_') + 1);
+    if(commande != '/msg') {
+      option = message.substr(message.indexOf('_') + 1);
+    } else {
+      msg = message.substr(message.indexOf(' ') + 1);
+      option = message.substr(message.indexOf('_'));
+      var regex = /_(.*?)\ /;
+      option = option.match(regex);
+      if(typeof option !== 'undefined')
+        option = option[1];
+      
+    }
 
     switch(commande) {
      case '/join' :
@@ -206,7 +228,7 @@ log(message);
      $inputMessage.val('');
      break;
      case '/msg' :
-     sendMessageTo(option);
+     sendMessageTo(option, msg);
      $inputMessage.val('');
      break;
      case '/help' :
@@ -214,9 +236,9 @@ log(message);
      $inputMessage.val('');
      break;
      case '/pangolin' : 
-      easter('loop');
-      $inputMessage.val('');
-      break;
+     easter('loop');
+     $inputMessage.val('');
+     break;
      default:
      $inputMessage.val('');
      log('not a valid command , type <kbd>/help_</kbd> for help or man google', 'error');
@@ -227,7 +249,9 @@ log(message);
 
   // Sends a chat message
   function sendMessage () {
+
   	var message = $inputMessage.val();
+
     // Prevent markup from being injected into the message
     message = cleanInput(message);
     // if there is a non-empty message and a socket connection
@@ -267,6 +291,9 @@ log(message);
       case 'info':
       color = '#9b59b6'
       break;
+      case 'private':
+      color = "#2980b9"; 
+      break;
       default:
       color = '#ecf0f1';
       break;
@@ -278,13 +305,13 @@ log(message);
 
 
   // Adds the visual chat message to the message list
-  function addChatMessage (data, options, classRoom) {
+  function addChatMessage (data, options, room) {
     // Don't fade the message in if there is an 'X was typing'
     var $typingMessages = getTypingMessages(data);
     options = options || {};
     if ($typingMessages.length !== 0) {
-    	options.fade = false;
-    	$typingMessages.remove();
+      options.fade = false;
+      $typingMessages.remove();
     }
 
     var $usernameDiv = $('<span class="username"/>')
@@ -294,26 +321,26 @@ log(message);
     .text(data.message);
 
     var typingClass = data.typing ? 'typing' : '';
-    var $messageDiv = $('<li class="messages ' + classRoom + '"/>')
+    var $messageDiv = $('<li class="message '+room+'"/>')
     .data('username', data.username)
     .addClass(typingClass)
     .append($usernameDiv, $messageBodyDiv);
 
-    addMessageElement($messageDiv, options);
+    addMessageElement($messageDiv, options, room);
   }
-
   // Adds the visual chat typing message
   function addChatTyping (data) {
-  	data.typing = true;
-  	data.message = 'is typing';
-  	addChatMessage(data);
+    data.typing = true;
+    data.message = 'is typing';
+    addChatMessage(data, '', data.room);
   }
+
 
   // Removes the visual chat typing message
   function removeChatTyping (data) {
-  	getTypingMessages(data).fadeOut(function () {
-  		$(this).remove();
-  	});
+    getTypingMessages(data).fadeOut(function () {
+      $(this).remove();
+    });
   }
 
   // Adds a message element to the messages and scrolls to the bottom
@@ -321,37 +348,39 @@ log(message);
   // options.fade - If the element should fade-in (default = true)
   // options.prepend - If the element should prepend
   //   all other messages (default = false)
-  function addMessageElement (el, options) {
-  	var $el = $(el);
-
+  function addMessageElement (el, options, room) {
+    var $el = $(el);
+    $messages = null
+    $messages = $('.messages.' + room);
     // Setup default options
     if (!options) {
-    	options = {};
+      options = {};
     }
     if (typeof options.fade === 'undefined') {
-    	options.fade = true;
+      options.fade = true;
     }
     if (typeof options.prepend === 'undefined') {
-    	options.prepend = false;
+      options.prepend = false;
     }
 
     // Apply options
     if (options.fade) {
-    	$el.hide().fadeIn(FADE_TIME);
+      $el.hide().fadeIn(FADE_TIME);
     }
     if (options.prepend) {
-    	$messages.prepend($el);
+      $messages.prepend($el);
     } else {
-    	$messages.append($el);
-    }
-    $messages[0].scrollTop = $messages[0].scrollHeight;
-  }
+     $messages.append($el);
+   }
+   $messages[0].scrollTop = $messages[0].scrollHeight;
+ }
 
-  function addLogElement(el) {
-    var $el = $(el);
-    $log.append($el);
-    $log[0].scrollTop = $log[0].scrollHeight;
-  }
+
+ function addLogElement(el) {
+  var $el = $(el);
+  $log.append($el);
+  $log[0].scrollTop = $log[0].scrollHeight;
+}
 
   // Prevents input from having injected markup
   function cleanInput (input) {
@@ -360,29 +389,30 @@ log(message);
 
   // Updates the typing event
   function updateTyping () {
-  	if (connected) {
-  		if (!typing) {
-  			typing = true;
-  			socket.emit('typing');
-  		}
-  		lastTypingTime = (new Date()).getTime();
+    if (connected) {
+      if (!typing) {
+        typing = true;
+        socket.emit('typing', classRoom);
+      }
+      lastTypingTime = (new Date()).getTime();
 
-  		setTimeout(function () {
-  			var typingTimer = (new Date()).getTime();
-  			var timeDiff = typingTimer - lastTypingTime;
-  			if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
-  				socket.emit('stop typing');
-  				typing = false;
-  			}
-  		}, TYPING_TIMER_LENGTH);
-  	}
+      setTimeout(function () {
+        var typingTimer = (new Date()).getTime();
+        var timeDiff = typingTimer - lastTypingTime;
+        if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
+          socket.emit('stop typing');
+          typing = false;
+        }
+      }, TYPING_TIMER_LENGTH);
+    }
   }
+
 
   // Gets the 'X is typing' messages of a user
   function getTypingMessages (data) {
-  	return $('.typing.message').filter(function (i) {
-  		return $(this).data('username') === data.username;
-  	});
+    return $('.typing.message').filter(function (i) {
+      return $(this).data('username') === data.username;
+    });
   }
 
   // Gets the color of a username through our hash function
@@ -390,12 +420,13 @@ log(message);
     // Compute hash code
     var hash = 7;
     for (var i = 0; i < username.length; i++) {
-    	hash = username.charCodeAt(i) + (hash << 5) - hash;
-    }
+     hash = username.charCodeAt(i) + (hash << 5) - hash;
+   }
     // Calculate color
     var index = Math.abs(hash % COLORS.length);
     return COLORS[index];
   }
+
 
   // Keyboard events
 
@@ -445,7 +476,7 @@ log(message);
 
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', function (data) {
-  	addChatMessage(data, 'undefined', classRoom);
+  	addChatMessage(data, 'undefined', data.room);
   });
 
   // Whenever the server emits 'user joined', log it in the chat body
@@ -478,7 +509,6 @@ socket.on('chanList' , function(data) {
 
 socket.on('userList', function(data) {
   displayUser(data);
-  console.log(data);
 });
 
 socket.on('msgJoin', function(room) {
@@ -488,10 +518,9 @@ socket.on('msgPart', function(room) {
   log('<kbd>You leave the chan : </kbd><kbd>' + room + '</kbd>');
 });
 
-socket.on('sendMsgTo', function(name){
-  alert('Private message from ' + name + ' is like devil spam');
-    // sendMsgTo(name);
-  });
+socket.on('prvtMsg', function(data){
+  log('Private message incoming from <kbd>' + data.nameFrom + '</kbd><br/>"' + data.message + '"', 'private');
+});
 
 socket.on('newUsername', function(data) {
   changeUsername(data.data);
